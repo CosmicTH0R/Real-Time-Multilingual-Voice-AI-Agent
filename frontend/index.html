@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice AI Agent — Clinical Appointment Booking</title>
+  <meta name="description" content="Real-time multilingual voice AI agent for clinical appointment booking" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header id="header">
+      <div class="header-content">
+        <div class="logo">
+          <span class="logo-icon">🏥</span>
+          <h1>Voice AI Agent</h1>
+        </div>
+        <div class="header-controls">
+          <select id="language-select" title="Language">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="ta">தமிழ்</option>
+          </select>
+          <span id="connection-status" class="status-badge disconnected">Disconnected</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+      <!-- Left: Conversation Panel -->
+      <section id="conversation-panel">
+        <div id="transcript-container">
+          <div id="transcript-messages">
+            <div class="system-message">
+              <p>Welcome! Click the microphone to start a voice conversation, or type your message below.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div id="input-area">
+          <div id="mic-controls">
+            <button id="mic-button" class="mic-btn" title="Hold to speak">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1v11M12 18.5V23M8 23h8" />
+                <rect x="9" y="1" width="6" height="12" rx="3" />
+                <path d="M5 10a7 7 0 0 0 14 0" />
+              </svg>
+            </button>
+            <div id="recording-indicator" class="hidden">
+              <span class="pulse"></span>
+              <span>Listening...</span>
+            </div>
+          </div>
+          <div id="text-input-area">
+            <input type="text" id="text-input" placeholder="Type a message..." autocomplete="off" />
+            <button id="send-button" title="Send">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Debug & Info Panel -->
+      <aside id="debug-panel">
+        <div class="panel-section">
+          <h3 class="panel-title" data-toggle="latency-content">
+            ⏱ Latency
+            <span class="toggle-icon">▼</span>
+          </h3>
+          <div id="latency-content" class="panel-content">
+            <div class="latency-grid">
+              <div class="latency-item">
+                <span class="label">Total</span>
+                <span id="latency-total" class="value">—</span>
+              </div>
+              <div class="latency-item">
+                <span class="label">STT</span>
+                <span id="latency-stt" class="value">—</span>
+              </div>
+              <div class="latency-item">
+                <span class="label">LLM</span>
+                <span id="latency-llm" class="value">—</span>
+              </div>
+              <div class="latency-item">
+                <span class="label">TTS</span>
+                <span id="latency-tts" class="value">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3 class="panel-title" data-toggle="reasoning-content">
+            🧠 Reasoning Traces
+            <span class="toggle-icon">▼</span>
+          </h3>
+          <div id="reasoning-content" class="panel-content">
+            <div id="reasoning-traces">
+              <p class="empty-state">No traces yet</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3 class="panel-title" data-toggle="campaign-content">
+            📢 Campaigns
+            <span class="toggle-icon">▼</span>
+          </h3>
+          <div id="campaign-content" class="panel-content">
+            <button id="trigger-campaign" class="campaign-btn">Trigger Reminder Campaign</button>
+            <div id="campaign-status" class="empty-state">No active campaigns</div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
