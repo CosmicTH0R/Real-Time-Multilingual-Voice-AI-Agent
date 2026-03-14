@@ -20,18 +20,63 @@ logger = logging.getLogger("voice-ai.memory.persistent")
 class PersistentMemory:
     """PostgreSQL-backed cross-session memory."""
 
+    async def get_patient_profile(self, patient_id: str) -> dict:
+        """Retrieve the patient profile by ID."""
+        try:
+            from db.models import Patient
+
+            async with async_session_factory() as session:
+                patient = await session.get(Patient, uuid.UUID(patient_id))
+                if not patient:
+                    return {}
+                return {
+                    "name": patient.name,
+                    "phone": patient.phone,
+                    "language_pref": patient.language_pref,
+                }
+        except Exception as exc:
+            logger.warning("Failed to get patient profile: %s", exc)
+            return {}
+
+    async def get_recent_history(self, patient_id: str, limit: int = 10) -> list[dict]:
+        """Get recent appointment history for a patient."""
+        try:
+            from db.models import Appointment, Patient, Doctor
+
+            async with async_session_factory() as session:
+                result = await session.execute(
+                    select(Appointment, Doctor)
+                    .join(Doctor, Appointment.doctor_id == Doctor.id)
+                    .where(Appointment.patient_id == uuid.UUID(patient_id))
+                    .order_by(Appointment.created_at.desc())
+                    .limit(limit)
+                )
+                rows = result.all()
+
+                appointments = []
+                for appt, doctor in rows:
+                    appointments.append({
+                        "id": str(appt.id),
+                        "doctor": doctor.name,
+                        "specialization": doctor.specialization,
+                        "status": appt.status,
+                        "created_at": str(appt.created_at),
+                    })
+                return appointments
+        except Exception as exc:
+            logger.warning("Failed to get recent history: %s", exc)
+            return []
+
     async def get_patient_history(self, patient_id: str) -> dict:
         """Retrieve patient's appointment history and preferences."""
         try:
             from db.models import Appointment, Patient, Doctor
 
             async with async_session_factory() as session:
-                # Get patient info
                 patient = await session.get(Patient, uuid.UUID(patient_id))
                 if not patient:
                     return {}
 
-                # Get past appointments
                 result = await session.execute(
                     select(Appointment, Doctor)
                     .join(Doctor, Appointment.doctor_id == Doctor.id)

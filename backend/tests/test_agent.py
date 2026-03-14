@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 
-from backend.agent.core import VoiceAgent
-from backend.agent.prompts import SYSTEM_PROMPT_TEMPLATE
+from agent.core import VoiceAgent
+from agent.prompts import SYSTEM_PROMPT_TEMPLATE
 
 @pytest.fixture
 def agent():
     return VoiceAgent()
 
 @pytest.mark.asyncio
-@patch("backend.agent.core.execute_tool")
+@patch("agent.core.execute_tool")
 async def test_agent_tool_calling_loop(mock_execute_tool, agent):
     # Mock LLM generation to return a tool call
     mock_response = MagicMock()

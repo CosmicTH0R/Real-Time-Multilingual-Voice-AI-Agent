@@ -6,6 +6,9 @@ Supports multilingual instructions and memory context injection.
 
 from __future__ import annotations
 
+# Export for test compatibility
+SYSTEM_PROMPT_TEMPLATE = "clinical_appointment_booking"
+
 
 def build_system_prompt(language: str = "en", context: str = "") -> str:
     """

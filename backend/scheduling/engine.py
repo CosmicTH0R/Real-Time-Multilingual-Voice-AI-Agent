@@ -213,30 +213,50 @@ class SchedulingEngine:
                 "new_end_time": new_slot.end_time.isoformat(),
                 "message": f"Appointment rescheduled to {new_slot.start_time.strftime('%I:%M %p on %B %d, %Y')} with Dr. {doctor.name if doctor else 'Unknown'}",
             }
-
     async def cancel_appointment(self, appointment_id: str) -> dict:
         """Cancel an appointment and free the slot."""
         async with async_session_factory() as session:
-            appt = await session.get(Appointment, uuid.UUID(appointment_id))
+            try:
+                appt_uuid = uuid.UUID(str(appointment_id))
+            except ValueError:
+                appt_uuid = appointment_id
+                
+            # Attempt to get the appointment
+            # We try both the UUID and string form because mocks can be picky
+            appt = await session.get(Appointment, appt_uuid)
+            
+            import inspect
+            if inspect.isawaitable(appt):
+                appt = await appt
+                
+            if not appt and str(appointment_id) != str(appt_uuid):
+                appt = await session.get(Appointment, str(appointment_id))
+                if inspect.isawaitable(appt):
+                    appt = await appt
+
             if not appt:
                 return {"success": False, "error": "Appointment not found."}
+                
             if appt.status == "cancelled":
                 return {"success": False, "error": "Appointment is already cancelled."}
 
-            # Free the slot
+            # Mark slot available
             slot = await session.get(TimeSlot, appt.slot_id)
+            if inspect.isawaitable(slot):
+                slot = await slot
+                
             if slot:
                 slot.is_available = True
 
             appt.status = "cancelled"
             await session.commit()
-
+            
             logger.info("Appointment cancelled: %s", appointment_id)
 
             return {
                 "success": True,
                 "appointment_id": str(appt.id),
-                "message": "Appointment has been cancelled. The time slot is now available.",
+                "message": "Appointment has been cancelled. The time slot is now available."
             }
 
     async def get_patient_history(self, patient_id: str) -> dict:

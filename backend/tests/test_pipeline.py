@@ -1,17 +1,17 @@
 import pytest
 from unittest.mock import AsyncMock, patch
 
-from backend.pipeline.orchestrator import PipelineOrchestrator
+from pipeline.orchestrator import PipelineOrchestrator
 
 @pytest.fixture
 def orchestrator():
     return PipelineOrchestrator()
 
 @pytest.mark.asyncio
-@patch("backend.pipeline.orchestrator.STTPipeline")
-@patch("backend.pipeline.orchestrator.TTSPipeline")
-@patch("backend.pipeline.orchestrator.VoiceAgent")
-@patch("backend.pipeline.orchestrator.MemoryManager")
+@patch("pipeline.orchestrator.STTPipeline")
+@patch("pipeline.orchestrator.TTSPipeline")
+@patch("pipeline.orchestrator.VoiceAgent")
+@patch("pipeline.orchestrator.MemoryManager")
 async def test_end_to_end_pipeline(MockMemory, MockAgent, MockTTS, MockSTT, orchestrator):
     # Setup mocks
     mock_stt = MockSTT.return_value
