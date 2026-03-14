@@ -41,3 +41,6 @@ htmlcov/
 # Database
 *.db
 *.sqlite3
+
+# Walkthrough Scripts
+docs/loom_script.md
